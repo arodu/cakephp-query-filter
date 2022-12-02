@@ -5,6 +5,7 @@ namespace QueryFilter;
 
 use Cake\Console\CommandCollection;
 use Cake\Core\BasePlugin;
+use Cake\Core\Configure;
 use Cake\Core\ContainerInterface;
 use Cake\Core\PluginApplicationInterface;
 use Cake\Http\MiddlewareQueue;
@@ -15,6 +16,15 @@ use Cake\Routing\RouteBuilder;
  */
 class QueryFilterPlugin extends BasePlugin
 {
+    public const FINDER_SELECT = 'queryFilterSelect';
+    public const FINDER_EQUAL = 'queryFilterEqual';
+    public const FINDER_STRING = 'queryFilterString';
+    //public const FINDER_MULTISELECT = 'multiselect';
+
+    public const STRING_TEMPLATE_DEFAULT = '%{content}%';
+    public const STRING_TEMPLATE_BEFORE = '{content}%';
+    public const STRING_TEMPLATE_AFTER = '%{content}';
+
     /**
      * Load all the plugin configuration and bootstrap logic.
      *
