@@ -6,6 +6,7 @@ namespace QueryFilter\Model\Traits;
 
 use Cake\ORM\Query;
 use Cake\Utility\Text;
+use InvalidArgumentException;
 use QueryFilter\QueryFilterPlugin;
 
 trait BasicFinders
@@ -18,6 +19,10 @@ trait BasicFinders
 
     public function findQueryFilterEqual(Query $query, array $options = []): Query
     {
+        if (empty($options['tableField'])) {
+            throw new InvalidArgumentException('param tableField is necessary on options');
+        }
+
         $conditions = $this->mapConditions($options['tableField'], $options['value'], $this->fieldTemplates['default']);
 
         return $query->where($conditions);
@@ -25,6 +30,10 @@ trait BasicFinders
 
     public function findQueryFilterSelect(Query $query, array $options = []): Query
     {
+        if (empty($options['tableField'])) {
+            throw new InvalidArgumentException('param tableField is necessary on options');
+        }
+
         $conditions = $this->mapConditions($options['tableField'], $options['value'], $this->fieldTemplates['default']);
 
         return $query->where($conditions);
@@ -32,6 +41,10 @@ trait BasicFinders
 
     public function findQueryFilterString(Query $query, array $options = []): Query
     {
+        if (empty($options['tableField'])) {
+            throw new InvalidArgumentException('param tableField is necessary on options');
+        }
+
         $valueTemplate = $options['template'] ?? QueryFilterPlugin::STRING_TEMPLATE_DEFAULT;
         $value = $this->formatTemplate($valueTemplate, ['content' => $options['value']]);
         $conditions = $this->mapConditions($options['tableField'], $value, $this->fieldTemplates['like']);
