@@ -46,8 +46,13 @@ trait BasicFinders
         }
 
         $valueTemplate = $options['template'] ?? QueryFilterPlugin::STRING_TEMPLATE_DEFAULT;
-        $value = $this->formatTemplate($valueTemplate, ['content' => $options['value']]);
-        $conditions = $this->mapConditions($options['tableField'], $value, $this->fieldTemplates['like']);
+        $values = explode(' ', $options['value']);
+        $conditions = [];
+        
+        foreach ($values as $value) {
+            $formatValue = $this->formatTemplate($valueTemplate, ['content' => $value]);
+            $conditions = array_merge($conditions, $this->mapConditions($options['tableField'], $formatValue, $this->fieldTemplates['like']));
+        }
 
         return $query->where(['OR' => $conditions]);
     }
@@ -61,7 +66,7 @@ trait BasicFinders
         $conditions = [];
         foreach ($fields as $field) {
             $fieldFormat = $this->formatTemplate($fieldTemplate, ['content' => $field]);
-            $conditions[$fieldFormat] = $value;
+            $conditions[] = [$fieldFormat => $value];
         }
 
         return $conditions;
