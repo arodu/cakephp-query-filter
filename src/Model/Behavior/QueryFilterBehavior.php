@@ -9,14 +9,14 @@ use Cake\Http\Exception\NotFoundException;
 use Cake\ORM\Behavior;
 use Cake\ORM\Query;
 use InvalidArgumentException;
-use QueryFilter\Model\Traits\BasicFinders;
+use QueryFilter\Model\Traits\QueryFilterFinders;
 
 /**
  * QueryFilter behavior
  */
 class QueryFilterBehavior extends Behavior
 {
-    use BasicFinders;
+    use QueryFilterFinders;
 
     private array $_filterFields = [];
 
@@ -57,7 +57,6 @@ class QueryFilterBehavior extends Behavior
             throw new NotFoundException(__('Finder {0} not found on table class {1}', $options['finder'], $this->table()::class));
         }
 
-        // @todo set default option values
         $this->_filterFields[$key] = $options;
     }
 
@@ -123,9 +122,9 @@ class QueryFilterBehavior extends Behavior
      * @param array $filter
      * @return array
      */
-    protected function checkInputFields(array $filter): array
+    protected function checkInputFields(array $formData): array
     {
-        return array_filter($filter, function ($v, $k) {
+        return array_filter($formData, function ($v, $k) {
             return !empty($v);
         }, ARRAY_FILTER_USE_BOTH);
     }

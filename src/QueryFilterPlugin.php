@@ -19,11 +19,16 @@ class QueryFilterPlugin extends BasePlugin
     public const FINDER_SELECT = 'queryFilterSelect';
     public const FINDER_EQUAL = 'queryFilterEqual';
     public const FINDER_STRING = 'queryFilterString';
-    //public const FINDER_MULTISELECT = 'multiselect';
+    public const FINDER_MULTISELECT = 'queryFilterMultiSelect';
 
-    public const STRING_TEMPLATE_DEFAULT = '%{content}%';
-    public const STRING_TEMPLATE_BEFORE = '{content}%';
-    public const STRING_TEMPLATE_AFTER = '%{content}';
+    public const STRING_TEMPLATE_DEFAULT = '{content}';
+    public const STRING_TEMPLATE_LIKE_INNER = '%{content}%';
+    public const STRING_TEMPLATE_LIKE_BEFORE = '{content}%';
+    public const STRING_TEMPLATE_LIKE_AFTER = '%{content}';
+
+    public const FIELD_TEMPLATE_DEFAULT = '{content}';
+    public const FIELD_TEMPLATE_LIKE = '{content} LIKE';
+    public const FIELD_TEMPLATE_IN = '{content} IN';
 
     /**
      * Load all the plugin configuration and bootstrap logic.
