@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace QueryFilter\Model\Behavior;
 
-use Cake\Core\Configure;
 use Cake\Http\Exception\NotFoundException;
 use Cake\ORM\Behavior;
 use Cake\ORM\Query;
 use InvalidArgumentException;
+use QueryFilter\Model\Traits\QueryFilterDatesFinders;
 use QueryFilter\Model\Traits\QueryFilterFinders;
 
 /**
@@ -17,8 +17,11 @@ use QueryFilter\Model\Traits\QueryFilterFinders;
 class QueryFilterBehavior extends Behavior
 {
     use QueryFilterFinders;
+    //use QueryFilterDatesFinders;
 
     private array $_filterFields = [];
+
+    private int $_filtered = 0;
 
     /**
      * Default configuration.
@@ -67,6 +70,7 @@ class QueryFilterBehavior extends Behavior
      */
     public function queryFilter(Query $query, array $formData = []): Query
     {
+        $this->_filtered = 0;
         $inputFields = $this->checkInputFields($formData);
 
         foreach ($inputFields as $key => $value) {
@@ -106,6 +110,8 @@ class QueryFilterBehavior extends Behavior
             throw new NotFoundException('Finder cannot be recognized');
         }
 
+        $this->_filtered++;
+
         return $query;
     }
 
@@ -127,5 +133,15 @@ class QueryFilterBehavior extends Behavior
         return array_filter($formData, function ($v, $k) {
             return !empty($v);
         }, ARRAY_FILTER_USE_BOTH);
+    }
+
+    public function queryWasFiltered(): bool
+    {
+        return ($this->_filtered > 0);
+    }
+
+    public function queryFiltered(): int
+    {
+        return $this->_filtered;
     }
 }
