@@ -20,7 +20,6 @@ class QueryFilterBehavior extends Behavior
     //use QueryFilterDatesFinders;
 
     private array $_filterFields = [];
-
     private int $_filtered = 0;
 
     /**
@@ -137,7 +136,7 @@ class QueryFilterBehavior extends Behavior
 
     public function queryWasFiltered(): bool
     {
-        return ($this->_filtered > 0);
+        return ($this->queryFiltered() > 0);
     }
 
     public function queryFiltered(): int

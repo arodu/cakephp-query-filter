@@ -86,10 +86,8 @@ trait QueryFilterFinders
             $options['tableField'],
             $values,
             [
-                'templates' => [
-                    'field' => Hash::get($options, 'templates.field', QueryFilterPlugin::FIELD_TEMPLATE_LIKE),
-                    'value' => Hash::get($options, 'templates.value', QueryFilterPlugin::STRING_TEMPLATE_LIKE_INNER),
-                ]
+                'templateField' => Hash::get($options, 'templateField', QueryFilterPlugin::FIELD_TEMPLATE_LIKE),
+                'templateValue' => Hash::get($options, 'templateValue', QueryFilterPlugin::STRING_TEMPLATE_LIKE_INNER),
             ]
         );
 
@@ -104,16 +102,16 @@ trait QueryFilterFinders
      */
     protected function mapConditions(string|array $fields, string|array $values, array $options = []): array
     {
-        $fieldTemplate = Hash::get($options, 'templates.field', QueryFilterPlugin::FIELD_TEMPLATE_DEFAULT);
-        $valueTemplate = Hash::get($options, 'templates.value', QueryFilterPlugin::STRING_TEMPLATE_DEFAULT);
+        $templateField = Hash::get($options, 'templateField', QueryFilterPlugin::FIELD_TEMPLATE_DEFAULT);
+        $templateValue = Hash::get($options, 'templateValue', QueryFilterPlugin::STRING_TEMPLATE_DEFAULT);
         $fields = is_string($fields) ? [$fields] : $fields;
         $values = is_string($values) ? [$values] : $values;
 
         $conditions = [];
         foreach ($values as $value) {
-            $formatedValue = $this->formatTemplate($valueTemplate, ['content' => $value]);
+            $formatedValue = $this->formatTemplate($templateValue, ['content' => $value]);
             foreach ($fields as $field) {
-                $formatedField = $this->formatTemplate($fieldTemplate, ['content' => $field]);
+                $formatedField = $this->formatTemplate($templateField, ['content' => $field]);
                 $conditions[] = [$formatedField => $formatedValue];
             }
         }
