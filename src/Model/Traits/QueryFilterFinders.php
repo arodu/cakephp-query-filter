@@ -86,8 +86,10 @@ trait QueryFilterFinders
             $options['tableField'],
             $values,
             [
-                'templates.field' => Hash::get($options, 'templates.field', QueryFilterPlugin::FIELD_TEMPLATE_LIKE),
-                'templates.value' => Hash::get($options, 'templates.value', QueryFilterPlugin::STRING_TEMPLATE_LIKE_INNER),
+                'templates' => [
+                    'field' => Hash::get($options, 'templates.field', QueryFilterPlugin::FIELD_TEMPLATE_LIKE),
+                    'value' => Hash::get($options, 'templates.value', QueryFilterPlugin::STRING_TEMPLATE_LIKE_INNER),
+                ]
             ]
         );
 
