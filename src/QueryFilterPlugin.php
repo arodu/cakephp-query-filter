@@ -16,6 +16,8 @@ use Cake\Routing\RouteBuilder;
  */
 class QueryFilterPlugin extends BasePlugin
 {
+    public const DEFAULT_FILTER_KEY = 'f';
+
     public const FINDER_SELECT = 'queryFilterSelect';
     public const FINDER_EQUAL = 'queryFilterEqual';
     public const FINDER_STRING = 'queryFilterString';
