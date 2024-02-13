@@ -7,8 +7,8 @@ namespace QueryFilter\Model\Behavior;
 use Cake\Http\Exception\NotFoundException;
 use Cake\ORM\Behavior;
 use Cake\ORM\Query;
+use Cake\ORM\Query\SelectQuery;
 use InvalidArgumentException;
-use QueryFilter\Model\Traits\QueryFilterDatesFinders;
 use QueryFilter\Model\Traits\QueryFilterFinders;
 
 /**
@@ -67,7 +67,7 @@ class QueryFilterBehavior extends Behavior
      * @param array $formData
      * @return Query
      */
-    public function queryFilter(Query $query, array $formData = []): Query
+    public function queryFilter(SelectQuery $query, array $formData = []): SelectQuery
     {
         $this->_filtered = 0;
         $inputFields = $this->checkInputFields($formData);
@@ -85,7 +85,7 @@ class QueryFilterBehavior extends Behavior
      * @param mixed $value
      * @return Query
      */
-    protected function handleFinder(Query $query, string $key, mixed $value): Query
+    protected function handleFinder(SelectQuery $query, string $key, mixed $value): SelectQuery
     {
         $filterField = $this->getFilterField($key);
 
@@ -104,7 +104,7 @@ class QueryFilterBehavior extends Behavior
         if (is_callable($finder)) {
             $query = $finder($query, $options);
         } elseif (is_string($finder)) {
-            $query = $query->find($finder, $options);
+            $query = $query->find($finder, options: $options);
         } else {
             throw new NotFoundException('Finder cannot be recognized');
         }
