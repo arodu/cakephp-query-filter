@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace QueryFilter\Model\Traits;
 
-use Cake\ORM\Query;
+use Cake\ORM\Query\SelectQuery;
 use QueryFilter\QueryFilter;
 
 /**
@@ -16,11 +16,11 @@ trait QueryFilterFindersTrait
     /**
      * Matches rows where the field equals the value.
      *
-     * @param \Cake\ORM\Query $query The query.
+     * @param \Cake\ORM\Query\SelectQuery $query The query.
      * @param array $options Options: `tableField`, `value`, `templateField`.
-     * @return \Cake\ORM\Query
+     * @return \Cake\ORM\Query\SelectQuery
      */
-    public function findQueryFilterEqual(Query $query, array $options = []): Query
+    public function findQueryFilterEqual(SelectQuery $query, array $options = []): SelectQuery
     {
         $fields = $this->requireTableField($options);
         $value = $this->requireValue($options);
@@ -31,11 +31,11 @@ trait QueryFilterFindersTrait
     /**
      * Matches rows where the field does not equal the value.
      *
-     * @param \Cake\ORM\Query $query The query.
+     * @param \Cake\ORM\Query\SelectQuery $query The query.
      * @param array $options Options: `tableField`, `value`, `templateField`.
-     * @return \Cake\ORM\Query
+     * @return \Cake\ORM\Query\SelectQuery
      */
-    public function findQueryFilterNotEqual(Query $query, array $options = []): Query
+    public function findQueryFilterNotEqual(SelectQuery $query, array $options = []): SelectQuery
     {
         $fields = $this->requireTableField($options);
         $value = $this->requireValue($options);
@@ -47,11 +47,11 @@ trait QueryFilterFindersTrait
     /**
      * Matches rows where the field is in the given set of values.
      *
-     * @param \Cake\ORM\Query $query The query.
+     * @param \Cake\ORM\Query\SelectQuery $query The query.
      * @param array $options Options: `tableField`, `value` (array), `templateField`.
-     * @return \Cake\ORM\Query
+     * @return \Cake\ORM\Query\SelectQuery
      */
-    public function findQueryFilterIn(Query $query, array $options = []): Query
+    public function findQueryFilterIn(SelectQuery $query, array $options = []): SelectQuery
     {
         $fields = $this->requireTableField($options);
         $values = (array)$this->requireValue($options);
@@ -63,11 +63,11 @@ trait QueryFilterFindersTrait
     /**
      * Matches rows where the field is not in the given set of values.
      *
-     * @param \Cake\ORM\Query $query The query.
+     * @param \Cake\ORM\Query\SelectQuery $query The query.
      * @param array $options Options: `tableField`, `value` (array), `templateField`.
-     * @return \Cake\ORM\Query
+     * @return \Cake\ORM\Query\SelectQuery
      */
-    public function findQueryFilterNotIn(Query $query, array $options = []): Query
+    public function findQueryFilterNotIn(SelectQuery $query, array $options = []): SelectQuery
     {
         $fields = $this->requireTableField($options);
         $values = (array)$this->requireValue($options);
@@ -79,11 +79,11 @@ trait QueryFilterFindersTrait
     /**
      * Select finder: equals when the value is scalar, in when it is an array.
      *
-     * @param \Cake\ORM\Query $query The query.
+     * @param \Cake\ORM\Query\SelectQuery $query The query.
      * @param array $options Options: `tableField`, `value`, `templateField`.
-     * @return \Cake\ORM\Query
+     * @return \Cake\ORM\Query\SelectQuery
      */
-    public function findQueryFilterSelect(Query $query, array $options = []): Query
+    public function findQueryFilterSelect(SelectQuery $query, array $options = []): SelectQuery
     {
         return is_array($this->requireValue($options))
             ? $this->findQueryFilterIn($query, $options)
@@ -93,11 +93,11 @@ trait QueryFilterFindersTrait
     /**
      * Multi-select finder: matches any of the submitted values.
      *
-     * @param \Cake\ORM\Query $query The query.
+     * @param \Cake\ORM\Query\SelectQuery $query The query.
      * @param array $options Options: `tableField`, `value` (array), `templateField`.
-     * @return \Cake\ORM\Query
+     * @return \Cake\ORM\Query\SelectQuery
      */
-    public function findQueryFilterMultiSelect(Query $query, array $options = []): Query
+    public function findQueryFilterMultiSelect(SelectQuery $query, array $options = []): SelectQuery
     {
         return $this->findQueryFilterIn($query, $options);
     }

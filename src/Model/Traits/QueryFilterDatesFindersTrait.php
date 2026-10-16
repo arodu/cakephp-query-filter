@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace QueryFilter\Model\Traits;
 
 use Cake\Chronos\Chronos;
-use Cake\ORM\Query;
+use Cake\ORM\Query\SelectQuery;
 
 /**
  * Date finders: today, tomorrow, yesterday, past and future.
@@ -16,11 +16,11 @@ trait QueryFilterDatesFindersTrait
     /**
      * Matches rows whose field falls within today.
      *
-     * @param \Cake\ORM\Query $query The query.
+     * @param \Cake\ORM\Query\SelectQuery $query The query.
      * @param array $options Options: `tableField`.
-     * @return \Cake\ORM\Query
+     * @return \Cake\ORM\Query\SelectQuery
      */
-    public function findQueryFilterIsToday(Query $query, array $options = []): Query
+    public function findQueryFilterIsToday(SelectQuery $query, array $options = []): SelectQuery
     {
         return $this->betweenDay($query, $options, Chronos::today());
     }
@@ -28,11 +28,11 @@ trait QueryFilterDatesFindersTrait
     /**
      * Matches rows whose field falls within tomorrow.
      *
-     * @param \Cake\ORM\Query $query The query.
+     * @param \Cake\ORM\Query\SelectQuery $query The query.
      * @param array $options Options: `tableField`.
-     * @return \Cake\ORM\Query
+     * @return \Cake\ORM\Query\SelectQuery
      */
-    public function findQueryFilterIsTomorrow(Query $query, array $options = []): Query
+    public function findQueryFilterIsTomorrow(SelectQuery $query, array $options = []): SelectQuery
     {
         return $this->betweenDay($query, $options, Chronos::tomorrow());
     }
@@ -40,11 +40,11 @@ trait QueryFilterDatesFindersTrait
     /**
      * Matches rows whose field falls within yesterday.
      *
-     * @param \Cake\ORM\Query $query The query.
+     * @param \Cake\ORM\Query\SelectQuery $query The query.
      * @param array $options Options: `tableField`.
-     * @return \Cake\ORM\Query
+     * @return \Cake\ORM\Query\SelectQuery
      */
-    public function findQueryFilterIsYesterday(Query $query, array $options = []): Query
+    public function findQueryFilterIsYesterday(SelectQuery $query, array $options = []): SelectQuery
     {
         return $this->betweenDay($query, $options, Chronos::yesterday());
     }
@@ -52,11 +52,11 @@ trait QueryFilterDatesFindersTrait
     /**
      * Matches rows whose field is before now.
      *
-     * @param \Cake\ORM\Query $query The query.
+     * @param \Cake\ORM\Query\SelectQuery $query The query.
      * @param array $options Options: `tableField`.
-     * @return \Cake\ORM\Query
+     * @return \Cake\ORM\Query\SelectQuery
      */
-    public function findQueryFilterIsPast(Query $query, array $options = []): Query
+    public function findQueryFilterIsPast(SelectQuery $query, array $options = []): SelectQuery
     {
         return $this->compareNow($query, $options, '<');
     }
@@ -64,11 +64,11 @@ trait QueryFilterDatesFindersTrait
     /**
      * Matches rows whose field is after now.
      *
-     * @param \Cake\ORM\Query $query The query.
+     * @param \Cake\ORM\Query\SelectQuery $query The query.
      * @param array $options Options: `tableField`.
-     * @return \Cake\ORM\Query
+     * @return \Cake\ORM\Query\SelectQuery
      */
-    public function findQueryFilterIsFuture(Query $query, array $options = []): Query
+    public function findQueryFilterIsFuture(SelectQuery $query, array $options = []): SelectQuery
     {
         return $this->compareNow($query, $options, '>');
     }
@@ -76,12 +76,12 @@ trait QueryFilterDatesFindersTrait
     /**
      * Builds a full-day range condition (`field >= start AND field <= end`).
      *
-     * @param \Cake\ORM\Query $query The query.
+     * @param \Cake\ORM\Query\SelectQuery $query The query.
      * @param array $options The finder options.
      * @param \Cake\Chronos\Chronos $day The day to match.
-     * @return \Cake\ORM\Query
+     * @return \Cake\ORM\Query\SelectQuery
      */
-    protected function betweenDay(Query $query, array $options, Chronos $day): Query
+    protected function betweenDay(SelectQuery $query, array $options, Chronos $day): SelectQuery
     {
         $fields = $this->requireTableField($options);
         $start = (clone $day)->startOfDay();
@@ -98,12 +98,12 @@ trait QueryFilterDatesFindersTrait
     /**
      * Builds a comparison against now (`field OP now`).
      *
-     * @param \Cake\ORM\Query $query The query.
+     * @param \Cake\ORM\Query\SelectQuery $query The query.
      * @param array $options The finder options.
      * @param string $operator The comparison operator.
-     * @return \Cake\ORM\Query
+     * @return \Cake\ORM\Query\SelectQuery
      */
-    protected function compareNow(Query $query, array $options, string $operator): Query
+    protected function compareNow(SelectQuery $query, array $options, string $operator): SelectQuery
     {
         $fields = $this->requireTableField($options);
         $now = Chronos::now();

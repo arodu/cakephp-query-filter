@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace QueryFilter\Model\Traits;
 
-use Cake\ORM\Query;
+use Cake\ORM\Query\SelectQuery;
 use InvalidArgumentException;
 use QueryFilter\QueryFilter;
 
@@ -15,41 +15,41 @@ trait QueryFilterComparisonFindersTrait
     use QueryFilterConditionsTrait;
 
     /**
-     * @param \Cake\ORM\Query $query The query.
+     * @param \Cake\ORM\Query\SelectQuery $query The query.
      * @param array $options Options: `tableField`, `value`, `templateField`.
-     * @return \Cake\ORM\Query
+     * @return \Cake\ORM\Query\SelectQuery
      */
-    public function findQueryFilterGreaterThan(Query $query, array $options = []): Query
+    public function findQueryFilterGreaterThan(SelectQuery $query, array $options = []): SelectQuery
     {
         return $this->compare($query, $options, QueryFilter::FIELD_TEMPLATE_GREATER_THAN);
     }
 
     /**
-     * @param \Cake\ORM\Query $query The query.
+     * @param \Cake\ORM\Query\SelectQuery $query The query.
      * @param array $options Options: `tableField`, `value`, `templateField`.
-     * @return \Cake\ORM\Query
+     * @return \Cake\ORM\Query\SelectQuery
      */
-    public function findQueryFilterGreaterThanOrEqual(Query $query, array $options = []): Query
+    public function findQueryFilterGreaterThanOrEqual(SelectQuery $query, array $options = []): SelectQuery
     {
         return $this->compare($query, $options, QueryFilter::FIELD_TEMPLATE_GREATER_THAN_OR_EQUAL);
     }
 
     /**
-     * @param \Cake\ORM\Query $query The query.
+     * @param \Cake\ORM\Query\SelectQuery $query The query.
      * @param array $options Options: `tableField`, `value`, `templateField`.
-     * @return \Cake\ORM\Query
+     * @return \Cake\ORM\Query\SelectQuery
      */
-    public function findQueryFilterLessThan(Query $query, array $options = []): Query
+    public function findQueryFilterLessThan(SelectQuery $query, array $options = []): SelectQuery
     {
         return $this->compare($query, $options, QueryFilter::FIELD_TEMPLATE_LESS_THAN);
     }
 
     /**
-     * @param \Cake\ORM\Query $query The query.
+     * @param \Cake\ORM\Query\SelectQuery $query The query.
      * @param array $options Options: `tableField`, `value`, `templateField`.
-     * @return \Cake\ORM\Query
+     * @return \Cake\ORM\Query\SelectQuery
      */
-    public function findQueryFilterLessThanOrEqual(Query $query, array $options = []): Query
+    public function findQueryFilterLessThanOrEqual(SelectQuery $query, array $options = []): SelectQuery
     {
         return $this->compare($query, $options, QueryFilter::FIELD_TEMPLATE_LESS_THAN_OR_EQUAL);
     }
@@ -57,13 +57,13 @@ trait QueryFilterComparisonFindersTrait
     /**
      * Applies a comparison operator on the given field(s).
      *
-     * @param \Cake\ORM\Query $query The query.
+     * @param \Cake\ORM\Query\SelectQuery $query The query.
      * @param array $options The finder options.
      * @param string $templateField The field template holding the operator.
-     * @return \Cake\ORM\Query
+     * @return \Cake\ORM\Query\SelectQuery
      * @throws \InvalidArgumentException When the value is an array.
      */
-    protected function compare(Query $query, array $options, string $templateField): Query
+    protected function compare(SelectQuery $query, array $options, string $templateField): SelectQuery
     {
         $fields = $this->requireTableField($options);
         $value = $this->requireValue($options);

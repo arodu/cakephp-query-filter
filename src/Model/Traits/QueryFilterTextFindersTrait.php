@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace QueryFilter\Model\Traits;
 
-use Cake\ORM\Query;
+use Cake\ORM\Query\SelectQuery;
 use Cake\Utility\Text;
 use QueryFilter\QueryFilter;
 
@@ -19,11 +19,11 @@ trait QueryFilterTextFindersTrait
      *
      * The value is tokenized on spaces; quoted segments are kept together.
      *
-     * @param \Cake\ORM\Query $query The query.
+     * @param \Cake\ORM\Query\SelectQuery $query The query.
      * @param array $options Options: `tableField`, `value`, `templateField`, `templateValue`.
-     * @return \Cake\ORM\Query
+     * @return \Cake\ORM\Query\SelectQuery
      */
-    public function findQueryFilterString(Query $query, array $options = []): Query
+    public function findQueryFilterString(SelectQuery $query, array $options = []): SelectQuery
     {
         $fields = $this->requireTableField($options);
         $value = (string)$this->requireValue($options);

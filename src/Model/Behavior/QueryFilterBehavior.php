@@ -6,7 +6,7 @@ namespace QueryFilter\Model\Behavior;
 use Cake\Event\Event;
 use Cake\Http\Exception\NotFoundException;
 use Cake\ORM\Behavior;
-use Cake\ORM\Query;
+use Cake\ORM\Query\SelectQuery;
 use InvalidArgumentException;
 use QueryFilter\Model\Traits\QueryFilterAllFindersTrait;
 use QueryFilter\QueryFilter;
@@ -101,12 +101,12 @@ class QueryFilterBehavior extends Behavior
     /**
      * Applies every matching filter field to the query.
      *
-     * @param \Cake\ORM\Query $query The query.
+     * @param \Cake\ORM\Query\SelectQuery $query The query.
      * @param array $formData The submitted filter data (input key => value).
      * @param array $options Options: `key` (e.g. recent-filters group), `request`.
-     * @return \Cake\ORM\Query
+     * @return \Cake\ORM\Query\SelectQuery
      */
-    public function queryFilter(Query $query, array $formData = [], array $options = []): Query
+    public function queryFilter(SelectQuery $query, array $formData = [], array $options = []): SelectQuery
     {
         $this->_filtered = 0;
         $this->_applied = [];
@@ -160,12 +160,12 @@ class QueryFilterBehavior extends Behavior
     /**
      * Applies a single filter field to the query.
      *
-     * @param \Cake\ORM\Query $query The query.
+     * @param \Cake\ORM\Query\SelectQuery $query The query.
      * @param string $key The input key.
      * @param mixed $value The submitted value.
-     * @return \Cake\ORM\Query
+     * @return \Cake\ORM\Query\SelectQuery
      */
-    protected function handleFinder(Query $query, string $key, mixed $value): Query
+    protected function handleFinder(SelectQuery $query, string $key, mixed $value): SelectQuery
     {
         $filterField = $this->getFilterField($key);
 
@@ -195,7 +195,7 @@ class QueryFilterBehavior extends Behavior
             if (method_exists($this, $method)) {
                 $query = $this->{$method}($query, $finderOptions);
             } else {
-                $query = $query->find($finder, $finderOptions);
+                $query = $query->find($finder, ...$finderOptions);
             }
         } else {
             throw new NotFoundException('Finder cannot be recognized.');
