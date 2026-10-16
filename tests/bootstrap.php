@@ -33,6 +33,11 @@ require_once $root . '/vendor/autoload.php';
  */
 require_once $root . '/vendor/cakephp/cakephp/tests/bootstrap.php';
 
+/**
+ * Load the CakePHP global functions (__(), __n(), etc.).
+ */
+require_once $root . '/vendor/cakephp/cakephp/src/functions.php';
+
 if (file_exists($root . '/config/bootstrap.php')) {
     require $root . '/config/bootstrap.php';
 
@@ -45,6 +50,10 @@ use Cake\TestSuite\Fixture\SchemaLoader;
 // The plugin tests are self-contained: use an in-memory SQLite database.
 if (!ConnectionManager::getConfig('test')) {
     ConnectionManager::setConfig('test', ['url' => 'sqlite:///:memory:']);
+}
+// Tables resolve their connection from `default` unless told otherwise.
+if (!ConnectionManager::getConfig('default')) {
+    ConnectionManager::alias('test', 'default');
 }
 
 // Create the schema here; fixtures are data-only.
