@@ -10,7 +10,6 @@
         <ini name="apc.enable_cli" value="1"/>
     </php>
 
-    <!-- Add any additional test suites you want to run here -->
     <testsuites>
         <testsuite name="QueryFilter">
             <directory>tests/TestCase/</directory>
@@ -22,9 +21,9 @@
         <extension class="Cake\TestSuite\Fixture\PHPUnitExtension" />
     </extensions>
 
-    <filter>
-        <whitelist>
+    <coverage>
+        <include>
             <directory suffix=".php">src/</directory>
-        </whitelist>
-    </filter>
+        </include>
+    </coverage>
 </phpunit>

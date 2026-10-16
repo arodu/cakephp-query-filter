@@ -39,17 +39,13 @@ if (file_exists($root . '/config/bootstrap.php')) {
     return;
 }
 
-/**
- * Load schema from a SQL dump file.
- *
- * If your plugin does not use database fixtures you can
- * safely delete this.
- *
- * If you want to support multiple databases, consider
- * using migrations to provide schema for your plugin,
- * and using \Migrations\TestSuite\Migrator to load schema.
- */
+use Cake\Datasource\ConnectionManager;
 use Cake\TestSuite\Fixture\SchemaLoader;
 
-// Load a schema dump file.
+// The plugin tests are self-contained: use an in-memory SQLite database.
+if (!ConnectionManager::getConfig('test')) {
+    ConnectionManager::setConfig('test', ['url' => 'sqlite:///:memory:']);
+}
+
+// Create the schema here; fixtures are data-only.
 (new SchemaLoader())->loadSqlFiles('tests/schema.sql', 'test');
