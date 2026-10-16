@@ -1,26 +1,54 @@
 <?php
-
 declare(strict_types=1);
 
 namespace QueryFilter\Model\Behavior;
 
+use Cake\Event\Event;
 use Cake\Http\Exception\NotFoundException;
 use Cake\ORM\Behavior;
 use Cake\ORM\Query;
 use InvalidArgumentException;
-use QueryFilter\Model\Traits\QueryFilterDatesFinders;
-use QueryFilter\Model\Traits\QueryFilterFinders;
+use QueryFilter\Model\Traits\QueryFilterAllFindersTrait;
+use QueryFilter\QueryFilter;
 
 /**
- * QueryFilter behavior
+ * QueryFilter behavior.
+ *
+ * Maps form input keys to table finders and applies them to a query. Each
+ * filter field is registered through `addFilterField()` (or the `filterFields`
+ * config) with a `finder` (a table finder name or a callable) and, usually, a
+ * `tableField`.
+ *
+ * Events (all dispatched on the table's event manager):
+ * - `QueryFilter.beforeFilter` — before applying the filters.
+ * - `QueryFilter.afterFilter` — after applying the filters.
+ * - `QueryFilter.beforeFinder` — before applying a single field finder.
+ * - `QueryFilter.afterFinder` — after applying a single field finder.
  */
 class QueryFilterBehavior extends Behavior
 {
-    use QueryFilterFinders;
-    //use QueryFilterDatesFinders;
+    use QueryFilterAllFindersTrait;
 
-    private array $_filterFields = [];
-    private int $_filtered = 0;
+    /**
+     * Registered filter fields, keyed by their input key.
+     *
+     * @var array
+     */
+    protected array $_filterFields = [];
+
+    /**
+     * Number of filters applied by the last `queryFilter()` call.
+     *
+     * @var int
+     */
+    protected int $_filtered = 0;
+
+    /**
+     * Filters applied by the last `queryFilter()` call (input key => value).
+     *
+     * @var array
+     */
+    protected array $_applied = [];
 
     /**
      * Default configuration.
@@ -29,10 +57,12 @@ class QueryFilterBehavior extends Behavior
      */
     protected $_defaultConfig = [
         'filterFields' => [],
+        'filterKey' => QueryFilter::DEFAULT_FILTER_KEY,
+        'request' => null,
     ];
 
     /**
-     * @param array $config
+     * @param array $config Behavior configuration.
      * @return void
      */
     public function initialize(array $config): void
@@ -43,47 +73,97 @@ class QueryFilterBehavior extends Behavior
     }
 
     /**
-     * @param string $key
-     * @param array $options
+     * Registers a filter field.
+     *
+     * @param string $key The input key.
+     * @param array $options Options: `finder` (required), `tableField`, `templateField`, `templateValue`.
      * @return void
+     * @throws \InvalidArgumentException When `finder` is missing.
+     * @throws \Cake\Http\Exception\NotFoundException When the finder does not exist on the table.
      */
-    public function addFilterField(string $key, array $options = [])
+    public function addFilterField(string $key, array $options = []): void
     {
         $options['tableField'] = $options['tableField'] ?? null;
 
         if (empty($options['finder'])) {
-            throw new InvalidArgumentException('param finder is necessary on options');
+            throw new InvalidArgumentException('The "finder" option is required.');
         }
 
         if (is_string($options['finder']) && !$this->table()->hasFinder($options['finder'])) {
-            throw new NotFoundException(__('Finder {0} not found on table class {1}', $options['finder'], $this->table()::class));
+            throw new NotFoundException(
+                __('Finder {0} not found on table class {1}', $options['finder'], $this->table()::class)
+            );
         }
 
         $this->_filterFields[$key] = $options;
     }
 
     /**
-     * @param Query $query
-     * @param array $formData
-     * @return Query
+     * Applies every matching filter field to the query.
+     *
+     * @param \Cake\ORM\Query $query The query.
+     * @param array $formData The submitted filter data (input key => value).
+     * @param array $options Options: `key` (e.g. recent-filters group), `request`.
+     * @return \Cake\ORM\Query
      */
-    public function queryFilter(Query $query, array $formData = []): Query
+    public function queryFilter(Query $query, array $formData = [], array $options = []): Query
     {
         $this->_filtered = 0;
-        $inputFields = $this->checkInputFields($formData);
+        $this->_applied = [];
 
-        foreach ($inputFields as $key => $value) {
+        $this->dispatch(QueryFilter::EVENT_BEFORE_FILTER, $this->eventData($options, [
+            'data' => $formData,
+        ]));
+
+        foreach ($this->checkInputFields($formData) as $key => $value) {
             $query = $this->handleFinder($query, $key, $value);
         }
+
+        $this->dispatch(QueryFilter::EVENT_AFTER_FILTER, $this->eventData($options, [
+            'data' => $this->_applied,
+            'count' => $this->_filtered,
+        ]));
 
         return $query;
     }
 
     /**
-     * @param Query $query
-     * @param string $key
-     * @param mixed $value
-     * @return Query
+     * Whether the last `queryFilter()` call applied at least one filter.
+     *
+     * @return bool
+     */
+    public function queryWasFiltered(): bool
+    {
+        return $this->_filtered > 0;
+    }
+
+    /**
+     * Number of filters applied by the last `queryFilter()` call.
+     *
+     * @return int
+     */
+    public function queryFiltered(): int
+    {
+        return $this->_filtered;
+    }
+
+    /**
+     * Filters applied by the last `queryFilter()` call (input key => value).
+     *
+     * @return array
+     */
+    public function appliedFilters(): array
+    {
+        return $this->_applied;
+    }
+
+    /**
+     * Applies a single filter field to the query.
+     *
+     * @param \Cake\ORM\Query $query The query.
+     * @param string $key The input key.
+     * @param mixed $value The submitted value.
+     * @return \Cake\ORM\Query
      */
     protected function handleFinder(Query $query, string $key, mixed $value): Query
     {
@@ -96,26 +176,74 @@ class QueryFilterBehavior extends Behavior
         $finder = $filterField['finder'];
         unset($filterField['finder']);
 
-        $options = array_merge($filterField, [
+        $finderOptions = array_merge($filterField, [
             'key' => $key,
             'value' => $value,
         ]);
 
+        $this->dispatch(QueryFilter::EVENT_BEFORE_FINDER, $this->eventData([], [
+            'key' => $key,
+            'value' => $value,
+            'finder' => $finder,
+            'options' => $finderOptions,
+        ]));
+
         if (is_callable($finder)) {
-            $query = $finder($query, $options);
+            $query = $finder($query, $finderOptions);
         } elseif (is_string($finder)) {
-            $query = $query->find($finder, $options);
+            $query = $query->find($finder, $finderOptions);
         } else {
-            throw new NotFoundException('Finder cannot be recognized');
+            throw new NotFoundException('Finder cannot be recognized.');
         }
 
         $this->_filtered++;
+        $this->_applied[$key] = $value;
+
+        $this->dispatch(QueryFilter::EVENT_AFTER_FINDER, $this->eventData([], [
+            'key' => $key,
+            'value' => $value,
+            'finder' => $finder,
+            'query' => $query,
+        ]));
 
         return $query;
     }
 
     /**
-     * @param string $key
+     * Builds the common event data.
+     *
+     * @param array $options Options: `key`, `request`.
+     * @param array $data Event specific data.
+     * @return array
+     */
+    protected function eventData(array $options, array $data = []): array
+    {
+        $table = $this->table();
+
+        return $data + [
+            'table' => $table,
+            'alias' => $table->getAlias(),
+            'key' => $options['key'] ?? $this->getConfig('filterKey'),
+            'request' => $options['request'] ?? $this->getConfig('request'),
+        ];
+    }
+
+    /**
+     * Dispatches an event on the table's event manager.
+     *
+     * @param string $name The event name.
+     * @param array $data The event data.
+     * @return void
+     */
+    protected function dispatch(string $name, array $data): void
+    {
+        $this->table()->getEventManager()->dispatch(new Event($name, $this->table(), $data));
+    }
+
+    /**
+     * Returns a registered filter field.
+     *
+     * @param string $key The input key.
      * @return array|null
      */
     protected function getFilterField(string $key): ?array
@@ -124,23 +252,18 @@ class QueryFilterBehavior extends Behavior
     }
 
     /**
-     * @param array $filter
+     * Keeps only the submitted values that are worth filtering by.
+     *
+     * `null`, empty strings and empty arrays are dropped; `0`, `'0'` and other
+     * falsy-but-meaningful values are kept.
+     *
+     * @param array $formData The submitted data.
      * @return array
      */
     protected function checkInputFields(array $formData): array
     {
-        return array_filter($formData, function ($v, $k) {
-            return !empty($v);
-        }, ARRAY_FILTER_USE_BOTH);
-    }
-
-    public function queryWasFiltered(): bool
-    {
-        return ($this->queryFiltered() > 0);
-    }
-
-    public function queryFiltered(): int
-    {
-        return $this->_filtered;
+        return array_filter($formData, function ($value): bool {
+            return $value !== null && $value !== '' && $value !== [];
+        });
     }
 }
