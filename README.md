@@ -33,14 +33,14 @@ $this->addBehavior('QueryFilter.QueryFilter', [
 ]);
 
 // In the controller action
-$query = $this->Students->find();
-$query = $this->Students->queryFilter($query, $this->request->getQuery('f') ?? []);
+$behavior = $this->Students->getBehavior('QueryFilter');
+$query = $behavior->queryFilter($this->Students->find(), $this->request->getQuery('f') ?? []);
 ```
 
 ## Documentation
 
 - [Usage](docs/usage.md) — registering filters and applying them.
-- [Finders reference](docs/finders.md) — every finder, its options and examples.
+- [Finders reference](docs/finders.md) — every finder, its arguments and examples.
 - [Templates](docs/templates.md) — building field/value conditions.
 - [Events](docs/events.md) — `beforeFilter`, `afterFilter`, `beforeFinder`, `afterFinder`.
 

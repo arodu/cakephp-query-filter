@@ -13,8 +13,8 @@ $this->addBehavior('QueryFilter.QueryFilter', [
     ],
 ]);
 
-// or programmatically
-$this->addFilterField('status', [
+// or programmatically (after the behavior is attached)
+$this->getBehavior('QueryFilter')->addFilterField('status', [
     'tableField' => 'status',
     'finder' => QueryFilter::FINDER_SELECT,
 ]);
@@ -40,8 +40,8 @@ callable** or a **finder defined on the Table** and referenced by name.
 ### Inline callable
 
 ```php
-$this->addFilterField('lapse', [
-    'finder' => function (Query $query, array $options): Query {
+$this->getBehavior('QueryFilter')->addFilterField('lapse', [
+    'finder' => function (SelectQuery $query, array $options): SelectQuery {
         return $query->where(['lapse_id IN' => $options['value']]);
     },
 ]);
@@ -54,7 +54,7 @@ checks that the finder exists, so typos fail fast.
 
 ```php
 // src/Model/Table/StudentsTable.php
-public function findByNameOrDni(Query $query, array $options = []): Query
+public function findByNameOrDni(SelectQuery $query, array $options = []): SelectQuery
 {
     return $query->where([
         'OR' => [
@@ -67,7 +67,7 @@ public function findByNameOrDni(Query $query, array $options = []): Query
 
 ```php
 // register it (the method `findByNameOrDni` is referenced as `nameOrDni`)
-$this->addFilterField('q', [
+$this->getBehavior('QueryFilter')->addFilterField('q', [
     'finder' => 'nameOrDni',
 ]);
 ```
@@ -82,8 +82,8 @@ as-is; string finders are resolved against the table.
 ## Applying filters
 
 ```php
-$query = $this->Students->find();
-$query = $this->Students->queryFilter($query, $this->request->getQuery('f') ?? []);
+$behavior = $this->Students->getBehavior('QueryFilter');
+$query = $behavior->queryFilter($this->Students->find(), $this->request->getQuery('f') ?? []);
 ```
 
 The second argument is the filter payload (`input key => value`). Empty values
@@ -93,9 +93,10 @@ filters like `active=0` work.
 ### Inspecting the result
 
 ```php
-$this->Students->queryWasFiltered();   // bool: at least one filter applied
-$this->Students->queryFiltered();      // int: number of filters applied
-$this->Students->appliedFilters();     // array: input key => value actually applied
+$behavior = $this->Students->getBehavior('QueryFilter');
+$behavior->queryWasFiltered();   // bool: at least one filter applied
+$behavior->queryFiltered();      // int: number of filters applied
+$behavior->appliedFilters();     // array: input key => value actually applied
 ```
 
 ## Form / request shape

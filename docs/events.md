@@ -22,7 +22,8 @@ Common data: `table`, `alias`.
 `key` is the group key. Pass it when applying filters:
 
 ```php
-$query = $this->Students->queryFilter($query, $filters, ['key' => 'students.index']);
+$behavior = $this->Students->getBehavior('QueryFilter');
+$query = $behavior->queryFilter($query, $filters, ['key' => 'students.index']);
 ```
 
 ## Example — recent filters
@@ -30,7 +31,8 @@ $query = $this->Students->queryFilter($query, $filters, ['key' => 'students.inde
 If the application has a `RecentFilters` model, save the filter that was used:
 
 ```php
-use Cake\ORM\Locator\LocatorAwareTrait;
+use Cake\Event\Event;
+use Cake\ORM\TableRegistry;
 use QueryFilter\QueryFilter;
 
 // e.g. in Application::bootstrap() or a controller
@@ -43,7 +45,7 @@ $this->Students->getEventManager()->on(
         }
 
         $locator = TableRegistry::getTableLocator();
-        if (!$locator->exists('RecentFilters')) {
+        if (!$locator->has('RecentFilters')) {
             return;
         }
 
@@ -51,7 +53,7 @@ $this->Students->getEventManager()->on(
         $recent->group_key = $data['key'];
         $recent->filter = json_encode($data['data']);
         $locator->get('RecentFilters')->save($recent);
-    }
+    },
 );
 ```
 

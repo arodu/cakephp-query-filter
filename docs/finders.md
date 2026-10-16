@@ -1,11 +1,15 @@
 # QueryFilter — Finders reference
 
 All finders live under the `QueryFilter\QueryFilter` constants and can be used
-directly (`$table->find(QueryFilter::FINDER_STRING, $options)`) or through a
-registered filter field.
+directly or through a registered filter field. In CakePHP 5 a finder is invoked
+with **named arguments**:
 
-| Constant | Find name | Options | Produces |
-|----------|-----------|---------|----------|
+```php
+$table->find(QueryFilter::FINDER_STRING, tableField: 'name', value: 'ada');
+```
+
+| Constant | Find name | Arguments | Produces |
+|----------|-----------|-----------|----------|
 | `FINDER_EQUAL` | `queryFilterEqual` | `tableField`, `value` | `field = value` (AND across fields) |
 | `FINDER_NOT_EQUAL` | `queryFilterNotEqual` | `tableField`, `value` | `field != value` (AND across fields) |
 | `FINDER_IN` | `queryFilterIn` | `tableField`, `value` (array) | `field IN (…)` (OR across fields) |
@@ -23,19 +27,21 @@ registered filter field.
 | `FINDER_IS_PAST` | `queryFilterIsPast` | `tableField` | `field < now` |
 | `FINDER_IS_FUTURE` | `queryFilterIsFuture` | `tableField` | `field > now` |
 
-`tableField` may be a single column or an array of columns.
+`tableField` may be a single column or an array of columns. `templateField` /
+`templateValue` may be passed as extra named arguments (see
+[templates](templates.md)).
 
 ## Equality and sets
 
 ```php
 // active records
-$table->find(QueryFilter::FINDER_EQUAL, ['tableField' => 'status', 'value' => 'active']);
+$table->find(QueryFilter::FINDER_EQUAL, tableField: 'status', value: 'active');
 
 // any of several statuses
-$table->find(QueryFilter::FINDER_IN, ['tableField' => 'status', 'value' => ['active', 'pending']]);
+$table->find(QueryFilter::FINDER_IN, tableField: 'status', value: ['active', 'pending']);
 
 // everything except inactive
-$table->find(QueryFilter::FINDER_NOT_IN, ['tableField' => 'status', 'value' => ['inactive']]);
+$table->find(QueryFilter::FINDER_NOT_IN, tableField: 'status', value: ['inactive']);
 ```
 
 ## Text search
@@ -44,15 +50,15 @@ Splits the value on spaces and matches rows where any column contains any token.
 Quoted segments stay together and the quotes are stripped:
 
 ```php
-$table->find(QueryFilter::FINDER_STRING, ['tableField' => ['first_name', 'last_name'], 'value' => 'ada lovelace']);
-$table->find(QueryFilter::FINDER_STRING, ['tableField' => 'name', 'value' => '"grace hopper"']);
+$table->find(QueryFilter::FINDER_STRING, tableField: ['first_name', 'last_name'], value: 'ada lovelace');
+$table->find(QueryFilter::FINDER_STRING, tableField: 'name', value: '"grace hopper"');
 ```
 
 ## Comparison
 
 ```php
-$table->find(QueryFilter::FINDER_GREATER_THAN_OR_EQUAL, ['tableField' => 'age', 'value' => 18]);
-$table->find(QueryFilter::FINDER_LESS_THAN, ['tableField' => 'created', 'value' => $limit]);
+$table->find(QueryFilter::FINDER_GREATER_THAN_OR_EQUAL, tableField: 'age', value: 18);
+$table->find(QueryFilter::FINDER_LESS_THAN, tableField: 'created', value: $limit);
 ```
 
 `value` must be a scalar or a `DateTimeInterface` (arrays are rejected).
@@ -63,8 +69,8 @@ $table->find(QueryFilter::FINDER_LESS_THAN, ['tableField' => 'created', 'value' 
 `IsFuture` compare against now.
 
 ```php
-$table->find(QueryFilter::FINDER_IS_TODAY, ['tableField' => 'created']);
-$table->find(QueryFilter::FINDER_IS_FUTURE, ['tableField' => 'due_date']);
+$table->find(QueryFilter::FINDER_IS_TODAY, tableField: 'created');
+$table->find(QueryFilter::FINDER_IS_FUTURE, tableField: 'due_date');
 ```
 
 ----------

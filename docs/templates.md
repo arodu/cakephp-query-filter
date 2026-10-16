@@ -32,15 +32,16 @@ For example, `FIELD_TEMPLATE_LIKE` with column `name` and
 
 ## Overriding templates
 
-Pass `templateField` / `templateValue` in the finder options (or the filter
-field) to change the behaviour:
+Pass `templateField` / `templateValue` as extra named arguments (or in the
+filter field) to change the behaviour:
 
 ```php
-$table->find(QueryFilter::FINDER_STRING, [
-    'tableField' => 'name',
-    'value' => 'ada',
-    'templateValue' => QueryFilter::STRING_TEMPLATE_LIKE_AFTER, // 'ada%'
-]);
+$table->find(
+    QueryFilter::FINDER_STRING,
+    tableField: 'name',
+    value: 'ada',
+    templateValue: QueryFilter::STRING_TEMPLATE_LIKE_AFTER, // 'ada%'
+);
 ```
 
 ----------
