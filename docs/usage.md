@@ -29,9 +29,15 @@ Each field accepts:
 | `templateField` | no | Field template override (see [templates](templates.md)). |
 | `templateValue` | no | Value template override. |
 
-When `finder` is a string it must be a finder known to the table (validate with
-`addFilterField()`, which throws otherwise). Callables receive
-`($query, $options)` and must return the query:
+`finder` is usually one of the built-ins (see [finders](finders.md)). For
+anything the built-ins don't cover, use a [custom finder](#custom-finders).
+
+## Custom finders
+
+For special cases a filter field can use a custom finder: either an **inline
+callable** or a **finder defined on the Table** and referenced by name.
+
+### Inline callable
 
 ```php
 $this->addFilterField('lapse', [
@@ -40,6 +46,38 @@ $this->addFilterField('lapse', [
     },
 ]);
 ```
+
+### A finder on the Table class
+
+Define a regular table finder and reference it by name. `addFilterField()`
+checks that the finder exists, so typos fail fast.
+
+```php
+// src/Model/Table/StudentsTable.php
+public function findByNameOrDni(Query $query, array $options = []): Query
+{
+    return $query->where([
+        'OR' => [
+            'name LIKE' => '%' . $options['value'] . '%',
+            'dni' => $options['value'],
+        ],
+    ]);
+}
+```
+
+```php
+// register it (the method `findByNameOrDni` is referenced as `nameOrDni`)
+$this->addFilterField('q', [
+    'finder' => 'nameOrDni',
+]);
+```
+
+### Contract
+
+Every custom finder receives `($query, $options)` and **must return the query**.
+`$options` always contains the submitted `value` and the input `key`, plus any
+extra options declared on the filter field (e.g. `tableField`). Callables run
+as-is; string finders are resolved against the table.
 
 ## Applying filters
 
