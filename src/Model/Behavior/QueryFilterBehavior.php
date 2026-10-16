@@ -55,7 +55,7 @@ class QueryFilterBehavior extends Behavior
      *
      * @var array<string, mixed>
      */
-    protected $_defaultConfig = [
+    protected array $_defaultConfig = [
         'filterFields' => [],
         'filterKey' => QueryFilter::DEFAULT_FILTER_KEY,
         'request' => null,
@@ -91,7 +91,7 @@ class QueryFilterBehavior extends Behavior
 
         if (is_string($options['finder']) && !$this->table()->hasFinder($options['finder'])) {
             throw new NotFoundException(
-                __('Finder {0} not found on table class {1}', $options['finder'], $this->table()::class)
+                __('Finder {0} not found on table class {1}', $options['finder'], $this->table()::class),
             );
         }
 
@@ -191,7 +191,12 @@ class QueryFilterBehavior extends Behavior
         if (is_callable($finder)) {
             $query = $finder($query, $finderOptions);
         } elseif (is_string($finder)) {
-            $query = $query->find($finder, $finderOptions);
+            $method = 'find' . ucfirst($finder);
+            if (method_exists($this, $method)) {
+                $query = $this->{$method}($query, $finderOptions);
+            } else {
+                $query = $query->find($finder, $finderOptions);
+            }
         } else {
             throw new NotFoundException('Finder cannot be recognized.');
         }

@@ -16,7 +16,7 @@ abstract class QueryFilterTestCase extends TestCase
     /**
      * @var array
      */
-    protected $fixtures = [QueryFilterTestFixture::class];
+    protected array $fixtures = [QueryFilterTestFixture::class];
 
     /**
      * @var \QueryFilter\Test\TestTable\QueryFilterTestTable

@@ -84,8 +84,8 @@ trait QueryFilterDatesFindersTrait
     protected function betweenDay(Query $query, array $options, Chronos $day): Query
     {
         $fields = $this->requireTableField($options);
-        $start = $day->copy()->startOfDay();
-        $end = $day->copy()->endOfDay();
+        $start = (clone $day)->startOfDay();
+        $end = (clone $day)->endOfDay();
 
         $conditions = [];
         foreach ((array)$fields as $field) {

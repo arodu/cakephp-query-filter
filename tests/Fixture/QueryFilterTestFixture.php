@@ -19,12 +19,12 @@ class QueryFilterTestFixture extends TestFixture
      *
      * @var array
      */
-    public $fields = [];
+    public array $fields = [];
 
     /**
      * @var array
      */
-    public $records = [
+    public array $records = [
         [
             'id' => 1,
             'name' => 'Alice Smith',
