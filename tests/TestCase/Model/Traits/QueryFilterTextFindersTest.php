@@ -16,10 +16,7 @@ class QueryFilterTextFindersTest extends QueryFilterTestCase
      */
     public function testStringOnSingleField(): void
     {
-        $query = $this->Table->find(QueryFilter::FINDER_STRING, [
-            'tableField' => 'name',
-            'value' => 'alice',
-        ]);
+        $query = $this->Table->find(QueryFilter::FINDER_STRING, tableField: 'name', value: 'alice');
 
         $this->assertSame([1], $this->ids($query));
     }
@@ -29,10 +26,11 @@ class QueryFilterTextFindersTest extends QueryFilterTestCase
      */
     public function testStringOnMultipleFields(): void
     {
-        $query = $this->Table->find(QueryFilter::FINDER_STRING, [
-            'tableField' => ['name', 'email'],
-            'value' => 'bob',
-        ]);
+        $query = $this->Table->find(
+            QueryFilter::FINDER_STRING,
+            tableField: ['name', 'email'],
+            value: 'bob',
+        );
 
         $this->assertSame([2], $this->ids($query));
     }
@@ -42,10 +40,7 @@ class QueryFilterTextFindersTest extends QueryFilterTestCase
      */
     public function testStringTokenizesMultipleWords(): void
     {
-        $query = $this->Table->find(QueryFilter::FINDER_STRING, [
-            'tableField' => 'name',
-            'value' => 'carol white',
-        ]);
+        $query = $this->Table->find(QueryFilter::FINDER_STRING, tableField: 'name', value: 'carol white');
 
         $this->assertSame([3], $this->ids($query));
     }
@@ -55,10 +50,7 @@ class QueryFilterTextFindersTest extends QueryFilterTestCase
      */
     public function testStringKeepsQuotedSegmentsTogether(): void
     {
-        $query = $this->Table->find(QueryFilter::FINDER_STRING, [
-            'tableField' => 'name',
-            'value' => '"david brown"',
-        ]);
+        $query = $this->Table->find(QueryFilter::FINDER_STRING, tableField: 'name', value: '"david brown"');
 
         $this->assertSame([4], $this->ids($query));
     }

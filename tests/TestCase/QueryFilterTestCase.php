@@ -3,8 +3,9 @@ declare(strict_types=1);
 
 namespace QueryFilter\Test\TestCase;
 
-use Cake\ORM\Query;
+use Cake\ORM\Query\SelectQuery;
 use Cake\TestSuite\TestCase;
+use QueryFilter\Model\Behavior\QueryFilterBehavior;
 use QueryFilter\Test\Fixture\QueryFilterTestFixture;
 use QueryFilter\Test\TestTable\QueryFilterTestTable;
 
@@ -46,15 +47,25 @@ abstract class QueryFilterTestCase extends TestCase
     }
 
     /**
+     * Returns the QueryFilter behavior attached to the test table.
+     *
+     * @return \QueryFilter\Model\Behavior\QueryFilterBehavior
+     */
+    protected function behavior(): QueryFilterBehavior
+    {
+        return $this->Table->getBehavior('QueryFilter');
+    }
+
+    /**
      * Returns the ids matched by a query, in ascending order.
      *
-     * @param \Cake\ORM\Query $query The query.
+     * @param \Cake\ORM\Query\SelectQuery $query The query.
      * @return array
      */
-    protected function ids(Query $query): array
+    protected function ids(SelectQuery $query): array
     {
         $ids = [];
-        foreach ($query->select(['id'])->orderAsc('id')->all() as $row) {
+        foreach ($query->select(['id'])->orderByAsc('id')->all() as $row) {
             $ids[] = $row->id;
         }
 

@@ -5,7 +5,7 @@ namespace QueryFilter\Test\TestCase\Model\Behavior;
 
 use Cake\Event\Event;
 use Cake\Http\Exception\NotFoundException;
-use Cake\ORM\Query;
+use Cake\ORM\Query\SelectQuery;
 use InvalidArgumentException;
 use QueryFilter\QueryFilter;
 use QueryFilter\Test\TestCase\QueryFilterTestCase;
@@ -22,7 +22,7 @@ class QueryFilterBehaviorTest extends QueryFilterTestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        $this->Table->addFilterField('name', ['tableField' => 'name']);
+        $this->behavior()->addFilterField('name', ['tableField' => 'name']);
     }
 
     /**
@@ -32,7 +32,7 @@ class QueryFilterBehaviorTest extends QueryFilterTestCase
     {
         $this->expectException(NotFoundException::class);
 
-        $this->Table->addFilterField('name', ['finder' => 'doesNotExist']);
+        $this->behavior()->addFilterField('name', ['finder' => 'doesNotExist']);
     }
 
     /**
@@ -40,17 +40,17 @@ class QueryFilterBehaviorTest extends QueryFilterTestCase
      */
     public function testQueryFilterAppliesRegisteredFields(): void
     {
-        $this->Table->addFilterField('name', [
+        $this->behavior()->addFilterField('name', [
             'tableField' => 'name',
             'finder' => QueryFilter::FINDER_STRING,
         ]);
 
-        $query = $this->Table->queryFilter($this->Table->find(), ['name' => 'alice']);
+        $query = $this->behavior()->queryFilter($this->Table->find(), ['name' => 'alice']);
 
         $this->assertSame([1], $this->ids($query));
-        $this->assertTrue($this->Table->queryWasFiltered());
-        $this->assertSame(1, $this->Table->queryFiltered());
-        $this->assertSame(['name' => 'alice'], $this->Table->appliedFilters());
+        $this->assertTrue($this->behavior()->queryWasFiltered());
+        $this->assertSame(1, $this->behavior()->queryFiltered());
+        $this->assertSame(['name' => 'alice'], $this->behavior()->appliedFilters());
     }
 
     /**
@@ -58,14 +58,14 @@ class QueryFilterBehaviorTest extends QueryFilterTestCase
      */
     public function testQueryFilterKeepsZeroValue(): void
     {
-        $this->Table->addFilterField('score', [
+        $this->behavior()->addFilterField('score', [
             'tableField' => 'score',
             'finder' => QueryFilter::FINDER_EQUAL,
         ]);
 
-        $this->Table->queryFilter($this->Table->find(), ['score' => '0']);
+        $this->behavior()->queryFilter($this->Table->find(), ['score' => '0']);
 
-        $this->assertSame(1, $this->Table->queryFiltered());
+        $this->assertSame(1, $this->behavior()->queryFiltered());
     }
 
     /**
@@ -73,15 +73,15 @@ class QueryFilterBehaviorTest extends QueryFilterTestCase
      */
     public function testQueryFilterDropsEmptyValues(): void
     {
-        $this->Table->addFilterField('name', [
+        $this->behavior()->addFilterField('name', [
             'tableField' => 'name',
             'finder' => QueryFilter::FINDER_STRING,
         ]);
 
-        $this->Table->queryFilter($this->Table->find(), ['name' => '']);
+        $this->behavior()->queryFilter($this->Table->find(), ['name' => '']);
 
-        $this->assertFalse($this->Table->queryWasFiltered());
-        $this->assertSame(0, $this->Table->queryFiltered());
+        $this->assertFalse($this->behavior()->queryWasFiltered());
+        $this->assertSame(0, $this->behavior()->queryFiltered());
     }
 
     /**
@@ -89,9 +89,9 @@ class QueryFilterBehaviorTest extends QueryFilterTestCase
      */
     public function testQueryFilterIgnoresUnregisteredKeys(): void
     {
-        $this->Table->queryFilter($this->Table->find(), ['unknown' => 'value']);
+        $this->behavior()->queryFilter($this->Table->find(), ['unknown' => 'value']);
 
-        $this->assertFalse($this->Table->queryWasFiltered());
+        $this->assertFalse($this->behavior()->queryWasFiltered());
     }
 
     /**
@@ -99,13 +99,13 @@ class QueryFilterBehaviorTest extends QueryFilterTestCase
      */
     public function testQueryFilterWithCallableFinder(): void
     {
-        $this->Table->addFilterField('age', [
-            'finder' => function (Query $query, array $options): Query {
+        $this->behavior()->addFilterField('age', [
+            'finder' => function (SelectQuery $query, array $options): SelectQuery {
                 return $query->where(['age >=' => $options['value']]);
             },
         ]);
 
-        $query = $this->Table->queryFilter($this->Table->find(), ['age' => 30]);
+        $query = $this->behavior()->queryFilter($this->Table->find(), ['age' => 30]);
 
         $this->assertSame([1, 3, 4], $this->ids($query));
     }
@@ -115,9 +115,9 @@ class QueryFilterBehaviorTest extends QueryFilterTestCase
      */
     public function testQueryFilterWithStringFinder(): void
     {
-        $this->Table->addFilterField('age', ['finder' => 'ageAbove']);
+        $this->behavior()->addFilterField('age', ['finder' => 'ageAbove']);
 
-        $query = $this->Table->queryFilter($this->Table->find(), ['age' => 30]);
+        $query = $this->behavior()->queryFilter($this->Table->find(), ['age' => 30]);
 
         $this->assertSame([4], $this->ids($query));
     }
@@ -127,7 +127,7 @@ class QueryFilterBehaviorTest extends QueryFilterTestCase
      */
     public function testAfterFilterEventIsDispatched(): void
     {
-        $this->Table->addFilterField('status', [
+        $this->behavior()->addFilterField('status', [
             'tableField' => 'status',
             'finder' => QueryFilter::FINDER_EQUAL,
         ]);
@@ -140,7 +140,7 @@ class QueryFilterBehaviorTest extends QueryFilterTestCase
             },
         );
 
-        $this->Table->queryFilter($this->Table->find(), ['status' => 'active'], ['key' => 'students.index']);
+        $this->behavior()->queryFilter($this->Table->find(), ['status' => 'active'], ['key' => 'students.index']);
 
         $this->assertNotNull($captured);
         $this->assertSame('students.index', $captured['key']);
@@ -161,7 +161,7 @@ class QueryFilterBehaviorTest extends QueryFilterTestCase
             },
         );
 
-        $this->Table->queryFilter($this->Table->find(), ['whatever' => 'value'], ['key' => 'group']);
+        $this->behavior()->queryFilter($this->Table->find(), ['whatever' => 'value'], ['key' => 'group']);
 
         $this->assertNotNull($captured);
         $this->assertSame('group', $captured['key']);
@@ -173,7 +173,7 @@ class QueryFilterBehaviorTest extends QueryFilterTestCase
      */
     public function testBeforeFinderEventIsDispatched(): void
     {
-        $this->Table->addFilterField('status', [
+        $this->behavior()->addFilterField('status', [
             'tableField' => 'status',
             'finder' => QueryFilter::FINDER_EQUAL,
         ]);
@@ -186,7 +186,7 @@ class QueryFilterBehaviorTest extends QueryFilterTestCase
             },
         );
 
-        $this->Table->queryFilter($this->Table->find(), ['status' => 'active']);
+        $this->behavior()->queryFilter($this->Table->find(), ['status' => 'active']);
 
         $this->assertTrue($called);
     }

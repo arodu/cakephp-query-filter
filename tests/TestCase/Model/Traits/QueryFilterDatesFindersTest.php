@@ -39,7 +39,7 @@ class QueryFilterDatesFindersTest extends QueryFilterTestCase
      */
     public function testIsToday(): void
     {
-        $query = $this->Table->find(QueryFilter::FINDER_IS_TODAY, ['tableField' => 'created']);
+        $query = $this->Table->find(QueryFilter::FINDER_IS_TODAY, tableField: 'created');
 
         $this->assertSame([2, 4], $this->ids($query));
     }
@@ -49,7 +49,7 @@ class QueryFilterDatesFindersTest extends QueryFilterTestCase
      */
     public function testIsTomorrow(): void
     {
-        $query = $this->Table->find(QueryFilter::FINDER_IS_TOMORROW, ['tableField' => 'created']);
+        $query = $this->Table->find(QueryFilter::FINDER_IS_TOMORROW, tableField: 'created');
 
         $this->assertSame([3], $this->ids($query));
     }
@@ -59,7 +59,7 @@ class QueryFilterDatesFindersTest extends QueryFilterTestCase
      */
     public function testIsYesterday(): void
     {
-        $query = $this->Table->find(QueryFilter::FINDER_IS_YESTERDAY, ['tableField' => 'created']);
+        $query = $this->Table->find(QueryFilter::FINDER_IS_YESTERDAY, tableField: 'created');
 
         $this->assertSame([1], $this->ids($query));
     }
@@ -69,7 +69,7 @@ class QueryFilterDatesFindersTest extends QueryFilterTestCase
      */
     public function testIsPast(): void
     {
-        $query = $this->Table->find(QueryFilter::FINDER_IS_PAST, ['tableField' => 'created']);
+        $query = $this->Table->find(QueryFilter::FINDER_IS_PAST, tableField: 'created');
 
         $this->assertSame([1, 4], $this->ids($query));
     }
@@ -79,7 +79,7 @@ class QueryFilterDatesFindersTest extends QueryFilterTestCase
      */
     public function testIsFuture(): void
     {
-        $query = $this->Table->find(QueryFilter::FINDER_IS_FUTURE, ['tableField' => 'created']);
+        $query = $this->Table->find(QueryFilter::FINDER_IS_FUTURE, tableField: 'created');
 
         $this->assertSame([2, 3], $this->ids($query));
     }

@@ -17,10 +17,7 @@ class QueryFilterComparisonFindersTest extends QueryFilterTestCase
      */
     public function testGreaterThan(): void
     {
-        $query = $this->Table->find(QueryFilter::FINDER_GREATER_THAN, [
-            'tableField' => 'age',
-            'value' => 30,
-        ]);
+        $query = $this->Table->find(QueryFilter::FINDER_GREATER_THAN, tableField: 'age', value: 30);
 
         $this->assertSame([4], $this->ids($query));
     }
@@ -30,10 +27,7 @@ class QueryFilterComparisonFindersTest extends QueryFilterTestCase
      */
     public function testGreaterThanOrEqual(): void
     {
-        $query = $this->Table->find(QueryFilter::FINDER_GREATER_THAN_OR_EQUAL, [
-            'tableField' => 'age',
-            'value' => 30,
-        ]);
+        $query = $this->Table->find(QueryFilter::FINDER_GREATER_THAN_OR_EQUAL, tableField: 'age', value: 30);
 
         $this->assertSame([1, 3, 4], $this->ids($query));
     }
@@ -43,10 +37,7 @@ class QueryFilterComparisonFindersTest extends QueryFilterTestCase
      */
     public function testLessThan(): void
     {
-        $query = $this->Table->find(QueryFilter::FINDER_LESS_THAN, [
-            'tableField' => 'age',
-            'value' => 30,
-        ]);
+        $query = $this->Table->find(QueryFilter::FINDER_LESS_THAN, tableField: 'age', value: 30);
 
         $this->assertSame([2], $this->ids($query));
     }
@@ -56,10 +47,7 @@ class QueryFilterComparisonFindersTest extends QueryFilterTestCase
      */
     public function testLessThanOrEqual(): void
     {
-        $query = $this->Table->find(QueryFilter::FINDER_LESS_THAN_OR_EQUAL, [
-            'tableField' => 'age',
-            'value' => 30,
-        ]);
+        $query = $this->Table->find(QueryFilter::FINDER_LESS_THAN_OR_EQUAL, tableField: 'age', value: 30);
 
         $this->assertSame([1, 2, 3], $this->ids($query));
     }
@@ -71,9 +59,6 @@ class QueryFilterComparisonFindersTest extends QueryFilterTestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        $this->Table->find(QueryFilter::FINDER_GREATER_THAN, [
-            'tableField' => 'age',
-            'value' => [1, 2],
-        ]);
+        $this->Table->find(QueryFilter::FINDER_GREATER_THAN, tableField: 'age', value: [1, 2]);
     }
 }

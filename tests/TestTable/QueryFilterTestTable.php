@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace QueryFilter\Test\TestTable;
 
-use Cake\ORM\Query;
+use Cake\ORM\Query\SelectQuery;
 use Cake\ORM\Table;
 
 /**
@@ -25,11 +25,11 @@ class QueryFilterTestTable extends Table
     /**
      * Custom finder used to test string (named) finders.
      *
-     * @param \Cake\ORM\Query $query The query.
+     * @param \Cake\ORM\Query\SelectQuery $query The query.
      * @param array $options The finder options.
-     * @return \Cake\ORM\Query
+     * @return \Cake\ORM\Query\SelectQuery
      */
-    public function findAgeAbove(Query $query, array $options = []): Query
+    public function findAgeAbove(SelectQuery $query, array $options = []): SelectQuery
     {
         return $query->where(['age >' => $options['value']]);
     }

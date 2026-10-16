@@ -17,10 +17,7 @@ class QueryFilterFindersTest extends QueryFilterTestCase
      */
     public function testEqual(): void
     {
-        $query = $this->Table->find(QueryFilter::FINDER_EQUAL, [
-            'tableField' => 'status',
-            'value' => 'active',
-        ]);
+        $query = $this->Table->find(QueryFilter::FINDER_EQUAL, tableField: 'status', value: 'active');
 
         $this->assertSame([1, 3], $this->ids($query));
     }
@@ -30,10 +27,7 @@ class QueryFilterFindersTest extends QueryFilterTestCase
      */
     public function testNotEqual(): void
     {
-        $query = $this->Table->find(QueryFilter::FINDER_NOT_EQUAL, [
-            'tableField' => 'status',
-            'value' => 'active',
-        ]);
+        $query = $this->Table->find(QueryFilter::FINDER_NOT_EQUAL, tableField: 'status', value: 'active');
 
         $this->assertSame([2, 4], $this->ids($query));
     }
@@ -43,10 +37,11 @@ class QueryFilterFindersTest extends QueryFilterTestCase
      */
     public function testIn(): void
     {
-        $query = $this->Table->find(QueryFilter::FINDER_IN, [
-            'tableField' => 'status',
-            'value' => ['active', 'pending'],
-        ]);
+        $query = $this->Table->find(
+            QueryFilter::FINDER_IN,
+            tableField: 'status',
+            value: ['active', 'pending'],
+        );
 
         $this->assertSame([1, 3, 4], $this->ids($query));
     }
@@ -56,10 +51,7 @@ class QueryFilterFindersTest extends QueryFilterTestCase
      */
     public function testNotIn(): void
     {
-        $query = $this->Table->find(QueryFilter::FINDER_NOT_IN, [
-            'tableField' => 'status',
-            'value' => ['active'],
-        ]);
+        $query = $this->Table->find(QueryFilter::FINDER_NOT_IN, tableField: 'status', value: ['active']);
 
         $this->assertSame([2, 4], $this->ids($query));
     }
@@ -69,10 +61,7 @@ class QueryFilterFindersTest extends QueryFilterTestCase
      */
     public function testSelectWithScalar(): void
     {
-        $query = $this->Table->find(QueryFilter::FINDER_SELECT, [
-            'tableField' => 'status',
-            'value' => 'inactive',
-        ]);
+        $query = $this->Table->find(QueryFilter::FINDER_SELECT, tableField: 'status', value: 'inactive');
 
         $this->assertSame([2], $this->ids($query));
     }
@@ -82,10 +71,11 @@ class QueryFilterFindersTest extends QueryFilterTestCase
      */
     public function testSelectWithArray(): void
     {
-        $query = $this->Table->find(QueryFilter::FINDER_SELECT, [
-            'tableField' => 'status',
-            'value' => ['active', 'pending'],
-        ]);
+        $query = $this->Table->find(
+            QueryFilter::FINDER_SELECT,
+            tableField: 'status',
+            value: ['active', 'pending'],
+        );
 
         $this->assertSame([1, 3, 4], $this->ids($query));
     }
@@ -95,10 +85,11 @@ class QueryFilterFindersTest extends QueryFilterTestCase
      */
     public function testMultiSelect(): void
     {
-        $query = $this->Table->find(QueryFilter::FINDER_MULTI_SELECT, [
-            'tableField' => 'status',
-            'value' => ['inactive', 'pending'],
-        ]);
+        $query = $this->Table->find(
+            QueryFilter::FINDER_MULTI_SELECT,
+            tableField: 'status',
+            value: ['inactive', 'pending'],
+        );
 
         $this->assertSame([2, 4], $this->ids($query));
     }
@@ -110,7 +101,7 @@ class QueryFilterFindersTest extends QueryFilterTestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        $this->Table->find(QueryFilter::FINDER_EQUAL, ['value' => 'active']);
+        $this->Table->find(QueryFilter::FINDER_EQUAL, value: 'active');
     }
 
     /**
@@ -120,6 +111,6 @@ class QueryFilterFindersTest extends QueryFilterTestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        $this->Table->find(QueryFilter::FINDER_EQUAL, ['tableField' => 'status']);
+        $this->Table->find(QueryFilter::FINDER_EQUAL, tableField: 'status');
     }
 }
