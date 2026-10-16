@@ -31,7 +31,7 @@ trait QueryFilterConditionsTrait
      * Returns the required `tableField` option (a field name or a list of fields).
      *
      * @param array $options The finder options.
-     * @return string|array
+     * @return array|string
      * @throws \InvalidArgumentException When the option is missing.
      */
     protected function requireTableField(array $options): string|array
@@ -64,7 +64,7 @@ trait QueryFilterConditionsTrait
      *
      * Used by search finders where any field/value pair may match (OR).
      *
-     * @param string|array $fields The field(s).
+     * @param array|string $fields The field(s).
      * @param array $values The value(s).
      * @param array $options Template options (`templateField`, `templateValue`).
      * @return array
@@ -92,7 +92,7 @@ trait QueryFilterConditionsTrait
      *
      * The value is kept as-is, so array values (e.g. for `IN`) work correctly.
      *
-     * @param string|array $fields The field(s).
+     * @param array|string $fields The field(s).
      * @param mixed $value The value.
      * @param array $options Template options (`templateField`).
      * @return array

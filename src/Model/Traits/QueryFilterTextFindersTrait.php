@@ -31,7 +31,7 @@ trait QueryFilterTextFindersTrait
         $tokens = Text::tokenize(preg_replace('/\s+/', ' ', trim($value)) ?? '', ' ', '"', '"');
         $tokens = array_values(array_filter(
             array_map(fn(string $token): string => trim($token, '"'), $tokens),
-            fn(string $token): bool => $token !== ''
+            fn(string $token): bool => $token !== '',
         ));
 
         $options += [

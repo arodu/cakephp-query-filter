@@ -137,7 +137,7 @@ class QueryFilterBehaviorTest extends QueryFilterTestCase
             QueryFilter::EVENT_AFTER_FILTER,
             function (Event $event) use (&$captured): void {
                 $captured = $event->getData();
-            }
+            },
         );
 
         $this->Table->queryFilter($this->Table->find(), ['status' => 'active'], ['key' => 'students.index']);
@@ -158,7 +158,7 @@ class QueryFilterBehaviorTest extends QueryFilterTestCase
             QueryFilter::EVENT_BEFORE_FILTER,
             function (Event $event) use (&$captured): void {
                 $captured = $event->getData();
-            }
+            },
         );
 
         $this->Table->queryFilter($this->Table->find(), ['whatever' => 'value'], ['key' => 'group']);
@@ -183,7 +183,7 @@ class QueryFilterBehaviorTest extends QueryFilterTestCase
             QueryFilter::EVENT_BEFORE_FINDER,
             function () use (&$called): void {
                 $called = true;
-            }
+            },
         );
 
         $this->Table->queryFilter($this->Table->find(), ['status' => 'active']);
