@@ -6,13 +6,13 @@ free of filter plumbing.
 
 ## Requirements
 
-- PHP >= 8.1
-- `cakephp/cakephp` ^4.4
+- PHP >= 8.2
+- `cakephp/cakephp` ^5.0
 
 ## Installation
 
 ```
-composer require arodu/cakephp-query-filter:^2.0
+composer require arodu/cakephp-query-filter:^3.0
 ```
 
 Load the plugin in `src/Application.php`:
